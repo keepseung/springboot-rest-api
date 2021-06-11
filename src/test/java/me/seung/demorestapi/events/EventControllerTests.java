@@ -22,16 +22,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class EventControllerTests {
 
+    // 스프링 MVC 테스트 핵심 클래스
     @Autowired
     MockMvc mockMvc;
 
+    // 이미 bin에 들어가 있음
     @Autowired
     ObjectMapper objectMapper;
-    @MockBean
-    EventRepository eventRepository;
+//    @MockBean
+//    EventRepository eventRepository;
     @Test
     public void createEvent() throws Exception {
         Event event = Event.builder()
+                .id(100)
                 .name("Spring")
                 .description("api desc")
                 .beginEnrollmentDateTime(LocalDateTime.of(2018,11,22,10,10,10))
@@ -47,16 +50,16 @@ public class EventControllerTests {
                 .build();
 
         mockMvc.perform(post("/api/events/")
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .accept(MediaTypes.HAL_JSON)
-                    .content(objectMapper.writeValueAsString(event)))
-                .andDo(print())
+                    .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                    .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
+                    .content(objectMapper.writeValueAsString(event))) // objectMapper가 Eve nt 객체를 문자열로 바꿔준다.
+                .andDo(print()) // 요청과 응답을, 응답을 출력해줌
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").exists())
-        .andExpect(header().exists(HttpHeaders.LOCATION))
-        .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE))
-        .andExpect(jsonPath("id").value(Matchers.not(100)))
-        .andExpect(jsonPath("free").value(Matchers.not(true)));
+                .andExpect(jsonPath("id").exists()) // 응답 값에서 id 값이 존재하는지 확인함
+        .andExpect(header().exists(HttpHeaders.LOCATION)) // LOCATION 헤더가 있는지 확인
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // CONTENT_TYPE 값이 HAL_JSON_VALUE로 나오는지 확인
+        .andExpect(jsonPath("id").value(Matchers.not(100))) // "id" 값이 100이면 안됨
+        .andExpect(jsonPath("free").value(Matchers.not(true))); // "free" 값이 true이면 안됨
 
 
     }

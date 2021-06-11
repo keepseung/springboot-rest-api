@@ -1,13 +1,11 @@
 package me.seung.demorestapi.events;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 
+@ToString
 @Getter @Builder @NoArgsConstructor @AllArgsConstructor
 public class EventDto {
     private String name;

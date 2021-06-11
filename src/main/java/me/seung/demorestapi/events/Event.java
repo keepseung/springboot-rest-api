@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity @ToString
 public class Event {
     @Id @GeneratedValue
     private Integer id;
