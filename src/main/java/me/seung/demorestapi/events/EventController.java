@@ -4,10 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 import static java.lang.System.out;
@@ -30,17 +32,15 @@ public class EventController {
     }
 
     @PostMapping
-    public ResponseEntity<Event> createEvent(@RequestBody EventDto eventDto){
+    public ResponseEntity<Event> createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
+        if (errors.hasErrors()){
+            return ResponseEntity.badRequest().build();
+        }
+
         // modelMapper의 map 함수를 통해 dto를 Event 클래스로 만들어줌
         Event event = modelMapper.map(eventDto, Event.class);
-        out.println("event "+event.toString());
         // Headers에 Location 값을 설정한다.
         Event newEvent = eventRepository.save(event);
-        if (newEvent ==null){
-            out.println("newEvent null");
-        }else{
-            out.println("newEvent not null");
-        }
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
         return ResponseEntity.created(createdUri).body(event);
     }

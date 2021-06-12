@@ -88,5 +88,14 @@ public class EventControllerTests {
         ;
     }
 
+    @Test
+    public void createEvent_Bad_Request_Empty_Input() throws Exception{
+        EventDto eventDto = EventDto.builder().build();
 
+        // 입력값이 없는 경우 Bad_Request 응답하도록 처리
+        this.mockMvc.perform(post("/api/events")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(this.objectMapper.writeValueAsString(eventDto)))
+                .andExpect(status().isBadRequest());
+    }
 }
