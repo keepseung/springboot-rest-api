@@ -1,5 +1,6 @@
 package me.seung.demorestapi.events;
 
+import me.seung.demorestapi.common.ErrorResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
@@ -39,12 +40,12 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
         if (errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors );
+            return badRequest(errors);
         }
 
         eventValidator.validate(eventDto, errors);
         if (errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         // modelMapper의 map 함수를 통해 dto를 Event 클래스로 만들어줌
@@ -61,5 +62,9 @@ public class EventController {
         //eventResource.add(selfLinkBuilder.withSelfRel()); // self라는 링크를 추가하기 위함
         eventResource.add(selfLinkBuilder.withRel("update-event")); // update를 위한   추가함. 릴레이션이랑 사용하는 메소드가 다름 (put)
         return ResponseEntity.created(createdUri).body(eventResource);
+    }
+
+    private ResponseEntity<ErrorResource> badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorResource(errors));
     }
 }
