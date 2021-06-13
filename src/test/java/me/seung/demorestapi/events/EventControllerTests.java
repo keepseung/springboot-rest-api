@@ -18,7 +18,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -70,7 +74,50 @@ public class EventControllerTests {
         .andExpect(jsonPath("_links.self").exists())
         .andExpect(jsonPath("_links.query-events").exists())
         .andExpect(jsonPath("_links.update-event").exists())
-        .andDo(document("create-event")) // 문서 생성 및 이름 명시
+        .andDo(document("create-event",
+                links(
+                        linkWithRel("self").description("link to self"),
+                        linkWithRel("query-events").description("link to query events"),
+                        linkWithRel("update-event").description("link to update an existing events")
+//                        linkWithRel("profile").description("link to profile")
+                ),
+                requestHeaders(
+                        headerWithName(HttpHeaders.ACCEPT).description("request acccept header"),
+                        headerWithName(HttpHeaders.CONTENT_TYPE).description("request content type header")
+                ),
+                requestFields(
+                        fieldWithPath("name").description("Name fo new Event"),
+                        fieldWithPath("description").description("description fo new Event"),
+                        fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime fo new Event"),
+                        fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime fo new Event"),
+                        fieldWithPath("beginEventDateTime").description("beginEventDateTime fo new Event"),
+                        fieldWithPath("endEventDateTime").description("endEventDateTime fo new Event"),
+                        fieldWithPath("basePrice").description("basePrice fo new Event"),
+                        fieldWithPath("maxPrice").description("maxPrice fo new Event"),
+                        fieldWithPath("limitOfEnrollment").description("limitOfEnrollment fo new Event"),
+                        fieldWithPath("location").description("location fo new Event")
+                ),
+                responseHeaders(
+                        headerWithName(HttpHeaders.LOCATION).description("response Location header"),
+                        headerWithName(HttpHeaders.CONTENT_TYPE).description("response content type header")
+                ),
+                relaxedResponseFields(
+                        fieldWithPath("id").description("Id fo new Event"),
+                        fieldWithPath("name").description("Name fo new Event"),
+                        fieldWithPath("description").description("description fo new Event"),
+                        fieldWithPath("beginEnrollmentDateTime").description("beginEnrollmentDateTime fo new Event"),
+                        fieldWithPath("closeEnrollmentDateTime").description("closeEnrollmentDateTime fo new Event"),
+                        fieldWithPath("beginEventDateTime").description("beginEventDateTime fo new Event"),
+                        fieldWithPath("endEventDateTime").description("endEventDateTime fo new Event"),
+                        fieldWithPath("basePrice").description("basePrice fo new Event"),
+                        fieldWithPath("maxPrice").description("maxPrice fo new Event"),
+                        fieldWithPath("limitOfEnrollment").description("limitOfEnrollment fo new Event"),
+                        fieldWithPath("location").description("location fo new Event"),
+                        fieldWithPath("free").description("free fo new Event"),
+                        fieldWithPath("offline").description("offline fo new Event"),
+                        fieldWithPath("eventStatus").description("eventStatus fo new Event")
+                )
+        )) // 문서 생성 및 이름 명시
         ;
 
     }
