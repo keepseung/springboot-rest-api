@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.Table;
@@ -31,13 +32,16 @@ class AccountServiceTest {
     @Autowired
     AccountRepository accountRepository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Test
     public void findByUserName(){
         String password = "keesun";
         String username = "keesun@gmail.com";
         Account account = Account.builder()
                 .email(username)
-                .password(password)
+                .password("{noop}"+password)
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
         this.accountRepository.save(account);
@@ -46,7 +50,8 @@ class AccountServiceTest {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         // Then
-        assertThat(userDetails.getPassword()).isEqualTo(password);
+        // 입력한 겻과 디비에서 읽어온 인코딩된 패스워드를 비교함
+        assertThat(this.passwordEncoder.matches(password,userDetails.getPassword())).isTrue();
 
     }
 
