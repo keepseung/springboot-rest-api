@@ -58,10 +58,13 @@ public class EventControllerTests {
         .andExpect(header().exists(HttpHeaders.LOCATION)) // LOCATION 헤더가 있는지 확인
         .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // CONTENT_TYPE 값이 HAL_JSON_VALUE로 나오는지 확인
         .andExpect(jsonPath("id").exists()) // "id" 값이 100이면 안됨
-        .andExpect(jsonPath("free").value(Matchers.not(false))) // "free" 값이 true이면 안됨
+//        .andExpect(jsonPath("free").value(Matchers.not(true))) // "free" 값이 true이면 안됨
         .andExpect(jsonPath("offline").value(Matchers.not(true)))
-        .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT.name())));
-
+        .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT.name())))
+        .andExpect(jsonPath("_links.self").exists())
+        .andExpect(jsonPath("_links.query-events").exists())
+        .andExpect(jsonPath("_links.update-event").exists())
+        ;
 
     }
 
