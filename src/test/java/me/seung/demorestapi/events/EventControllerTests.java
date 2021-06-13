@@ -1,13 +1,16 @@
 package me.seung.demorestapi.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.seung.demorestapi.common.RestDocsConfiguration;
 import me.seung.demorestapi.common.TestDescription;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,12 +18,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
+@Import(RestDocsConfiguration.class)
 public class EventControllerTests {
 
     // 스프링 MVC 테스트 핵심 클래스
@@ -59,11 +65,12 @@ public class EventControllerTests {
         .andExpect(header().string(HttpHeaders.CONTENT_TYPE,MediaTypes.HAL_JSON_VALUE)) // CONTENT_TYPE 값이 HAL_JSON_VALUE로 나오는지 확인
         .andExpect(jsonPath("id").exists()) // "id" 값이 100이면 안됨
 //        .andExpect(jsonPath("free").value(Matchers.not(true))) // "free" 값이 true이면 안됨
-        .andExpect(jsonPath("offline").value(Matchers.not(true)))
-        .andExpect(jsonPath("eventStatus").value(Matchers.not(EventStatus.DRAFT.name())))
+        .andExpect(jsonPath("offline").value(Matchers.equalTo(true)))
+        .andExpect(jsonPath("eventStatus").value(Matchers.equalTo(EventStatus.DRAFT.name())))
         .andExpect(jsonPath("_links.self").exists())
         .andExpect(jsonPath("_links.query-events").exists())
         .andExpect(jsonPath("_links.update-event").exists())
+        .andDo(document("create-event")) // 문서 생성 및 이름 명시
         ;
 
     }
