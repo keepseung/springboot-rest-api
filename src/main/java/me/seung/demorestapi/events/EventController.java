@@ -57,6 +57,7 @@ public class EventController {
 
         EventResource eventResource = new EventResource(event);
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
         //eventResource.add(selfLinkBuilder.withSelfRel()); // self라는 링크를 추가하기 위함
         eventResource.add(selfLinkBuilder.withRel("update-event")); // update를 위한   추가함. 릴레이션이랑 사용하는 메소드가 다름 (put)
         return ResponseEntity.created(createdUri).body(eventResource);

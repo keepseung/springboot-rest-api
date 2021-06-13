@@ -71,15 +71,12 @@ public class EventControllerTests {
 //        .andExpect(jsonPath("free").value(Matchers.not(true))) // "free" 값이 true이면 안됨
         .andExpect(jsonPath("offline").value(Matchers.equalTo(true)))
         .andExpect(jsonPath("eventStatus").value(Matchers.equalTo(EventStatus.DRAFT.name())))
-        .andExpect(jsonPath("_links.self").exists())
-        .andExpect(jsonPath("_links.query-events").exists())
-        .andExpect(jsonPath("_links.update-event").exists())
         .andDo(document("create-event",
                 links(
                         linkWithRel("self").description("link to self"),
                         linkWithRel("query-events").description("link to query events"),
-                        linkWithRel("update-event").description("link to update an existing events")
-//                        linkWithRel("profile").description("link to profile")
+                        linkWithRel("update-event").description("link to update an existing events"),
+                        linkWithRel("profile").description("link to profile")
                 ),
                 requestHeaders(
                         headerWithName(HttpHeaders.ACCEPT).description("request acccept header"),
@@ -101,7 +98,7 @@ public class EventControllerTests {
                         headerWithName(HttpHeaders.LOCATION).description("response Location header"),
                         headerWithName(HttpHeaders.CONTENT_TYPE).description("response content type header")
                 ),
-                relaxedResponseFields(
+                responseFields(
                         fieldWithPath("id").description("Id fo new Event"),
                         fieldWithPath("name").description("Name fo new Event"),
                         fieldWithPath("description").description("description fo new Event"),
@@ -115,7 +112,11 @@ public class EventControllerTests {
                         fieldWithPath("location").description("location fo new Event"),
                         fieldWithPath("free").description("free fo new Event"),
                         fieldWithPath("offline").description("offline fo new Event"),
-                        fieldWithPath("eventStatus").description("eventStatus fo new Event")
+                        fieldWithPath("eventStatus").description("eventStatus fo new Event"),
+                        fieldWithPath("_links.self.href").description("link to self"),
+                        fieldWithPath("_links.query-events.href").description("link to query-events"),
+                        fieldWithPath("_links.update-event.href").description("link to update-event"),
+                        fieldWithPath("_links.profile.href").description("link to profile")
                 )
         )) // 문서 생성 및 이름 명시
         ;
