@@ -37,7 +37,7 @@ public class EventController {
     @PostMapping
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
         if (errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return ResponseEntity.badRequest().body(errors );
         }
 
         eventValidator.validate(eventDto, errors);
@@ -47,6 +47,7 @@ public class EventController {
 
         // modelMapper의 map 함수를 통해 dto를 Event 클래스로 만들어줌
         Event event = modelMapper.map(eventDto, Event.class);
+        event.update();
         // Headers에 Location 값을 설정한다.
         Event newEvent = eventRepository.save(event);
         URI createdUri = linkTo(EventController.class).slash(newEvent.getId()).toUri();
