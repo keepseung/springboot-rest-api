@@ -2,12 +2,18 @@ package me.seung.demorestapi.events;
 
 import me.seung.demorestapi.common.ErrorResource;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +68,15 @@ public class EventController {
         //eventResource.add(selfLinkBuilder.withSelfRel()); // self라는 링크를 추가하기 위함
         eventResource.add(selfLinkBuilder.withRel("update-event")); // update를 위한   추가함. 릴레이션이랑 사용하는 메소드가 다름 (put)
         return ResponseEntity.created(createdUri).body(eventResource);
+    }
+
+    @GetMapping
+    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler){
+        Page<Event> page = this.eventRepository.findAll(pageable);
+        var pagedResource = assembler.toModel(page, e->new EventResource(e));
+        pagedResource.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
+        return ResponseEntity.ok(pagedResource);
+
     }
 
     private ResponseEntity<ErrorResource> badRequest(Errors errors) {
