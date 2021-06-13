@@ -4,8 +4,10 @@ import me.seung.demorestapi.accounts.Account;
 import me.seung.demorestapi.accounts.AccountRepository;
 import me.seung.demorestapi.accounts.AccountRole;
 import me.seung.demorestapi.accounts.AccountService;
+import me.seung.demorestapi.common.AppProperties;
 import me.seung.demorestapi.common.BaseControllerTest;
 import me.seung.demorestapi.common.TestDescription;
+import org.checkerframework.checker.units.qual.A;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +43,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AppProperties appProperties;
     @BeforeEach
     public void setUp(){
         this.eventRepository.deleteAll();
@@ -135,21 +140,16 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getAccessToken() throws Exception {
-        String clientId = "myApp";
-        String clientSecret = "pass";
-
-        String username = "keesunaaad@email.com";
-        String password = "keesunaaad";
         Account keesun = Account.builder()
-                .email(username)
-                .password(password)
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
         this.accountService.saveAccount(keesun);
         ResultActions perform = this.mockMvc.perform(post("/oauth/token")
-                .with(httpBasic(clientId, clientSecret))
-                .param("username", username)
-                .param("password", password)
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
                 .param("grant_type", "password"));
         String responseBody = perform.andReturn().getResponse().getContentAsString();
         System.out.println("responseBody "+responseBody);
