@@ -135,17 +135,19 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @NotNull
-    private String getBearerToken() throws Exception {
-        return "Bearer "+getAccessToken();
+    private String getBearerToken(boolean needToCreateAccount) throws Exception {
+        return "Bearer "+getAccessToken(needToCreateAccount);
     }
 
-    private String getAccessToken() throws Exception {
-        Account keesun = Account.builder()
-                .email(appProperties.getUserUsername())
-                .password(appProperties.getUserPassword())
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-        this.accountService.saveAccount(keesun);
+    @NotNull
+    private String getBearerToken() throws Exception {
+        return "Bearer "+getAccessToken(true);
+    }
+
+    private String getAccessToken(boolean needToCreateAccount) throws Exception {
+        if (needToCreateAccount){
+            createAccount();
+        }
         ResultActions perform = this.mockMvc.perform(post("/oauth/token")
                 .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
                 .param("username", appProperties.getUserUsername())
@@ -155,6 +157,15 @@ public class EventControllerTests extends BaseControllerTest {
         System.out.println("responseBody "+responseBody);
         Jackson2JsonParser parser = new Jackson2JsonParser();
         return parser.parseMap(responseBody).get("access_token").toString();
+    }
+
+    private Account createAccount() {
+        Account keesun = Account.builder()
+                .email(appProperties.getUserUsername())
+                .password(appProperties.getUserPassword())
+                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .build();
+        return this.accountService.saveAccount(keesun);
     }
 
     @Test
@@ -281,14 +292,25 @@ public class EventControllerTests extends BaseControllerTest {
 
     }
 
-    private Event generateEvent(int i) {
-        Event event = Event.builder()
+    private Event generateEvent(int index, Account account) {
+        Event event = buildEvent(index);
+        event.setManager(account);
+        return this.eventRepository.save(event);
+    }
+
+    private Event generateEvent(int index) {
+        Event event = buildEvent(index);
+        return this.eventRepository.save(event);
+    }
+
+    private Event buildEvent(int i) {
+        return Event.builder()
                 .name("event " + i)
                 .description("test event")
-                .beginEnrollmentDateTime(LocalDateTime.of(2018,11,22,10,10,10))
-                .closeEnrollmentDateTime(LocalDateTime.of(2018,11,22,10,10,10))
-                .beginEventDateTime(LocalDateTime.of(2018,11,22,10,10,10))
-                .endEventDateTime(LocalDateTime.of(2018,11,22,10,10,10))
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 11, 22, 10, 10, 10))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 11, 22, 10, 10, 10))
+                .beginEventDateTime(LocalDateTime.of(2018, 11, 22, 10, 10, 10))
+                .endEventDateTime(LocalDateTime.of(2018, 11, 22, 10, 10, 10))
                 .basePrice(100)
                 .maxPrice(200)
                 .limitOfEnrollment(100)
@@ -297,14 +319,14 @@ public class EventControllerTests extends BaseControllerTest {
                 .offline(true)
                 .eventStatus(EventStatus.DRAFT)
                 .build();
-        return this.eventRepository.save(event);
     }
 
     @Test
     @TestDescription("기존의 이벤트 하나 조회하기")
     public void getEvent() throws Exception{
         //given
-        Event event = this.generateEvent(100);
+        Account account = this.createAccount();
+        Event event = this.generateEvent(100, account);
 
         // when then
         this.mockMvc.perform(get("/api/events/{id}", event.getId()))
@@ -328,14 +350,15 @@ public class EventControllerTests extends BaseControllerTest {
     @TestDescription("이벤트를 정상적으로 수정하기")
     public void updateEvent() throws Exception{
         //given
-        Event event = this.generateEvent(200);
+        Account account = this.createAccount();
+        Event event = this.generateEvent(200, account);
         EventDto eventDto = this.modelMapper.map(event, EventDto.class);
         String eventName = "Updated test event";
         eventDto.setName(eventName);
 
         // when then
         this.mockMvc.perform(put("/api/events/{id}",event.getId())
-                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken(false))
                 .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
                 .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                 .content(objectMapper.writeValueAsString(eventDto))) // objectmapper를 사용해 객체를 json으로 만듬
