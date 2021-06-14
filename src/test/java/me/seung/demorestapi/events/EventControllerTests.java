@@ -70,7 +70,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         mockMvc.perform(post("/api/events/")
                     .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                    .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                    .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                     .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                     .content(objectMapper.writeValueAsString(event))) // objectMapper가 Eve nt 객체를 문자열로 바꿔준다.
                 .andDo(print()) // 요청과 응답을, 응답을 출력해줌
@@ -189,7 +189,7 @@ public class EventControllerTests extends BaseControllerTest {
 
         mockMvc.perform(post("/api/events/")
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                 .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                 .content(objectMapper.writeValueAsString(event))) // objectMapper가 Eve nt 객체를 문자열로 바꿔준다.
                 .andDo(print()) // 요청과 응답을, 응답을 출력해줌
@@ -205,7 +205,7 @@ public class EventControllerTests extends BaseControllerTest {
         // 입력값이 없는 경우 Bad_Request 응답하도록 처리
         this.mockMvc.perform(post("/api/events")
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andExpect(status().isBadRequest());
     }
@@ -229,7 +229,7 @@ public class EventControllerTests extends BaseControllerTest {
         // 입력값이 없는 경우 Bad_Request 응답하도록 처리
         this.mockMvc.perform(post("/api/events")
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(this.objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -359,7 +359,7 @@ public class EventControllerTests extends BaseControllerTest {
         // when then
         this.mockMvc.perform(put("/api/events/{id}",event.getId())
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken(false))
-                .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                 .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                 .content(objectMapper.writeValueAsString(eventDto))) // objectmapper를 사용해 객체를 json으로 만듬
                 .andDo(print())
@@ -384,7 +384,7 @@ public class EventControllerTests extends BaseControllerTest {
         // when then
         this.mockMvc.perform(put("/api/events/{id}",event.getId())
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                 .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                 .content(objectMapper.writeValueAsString(eventDto))) // objectmapper를 사용해 객체를 json으로 만듬
                 .andDo(print())
@@ -403,7 +403,7 @@ public class EventControllerTests extends BaseControllerTest {
         // when then
         this.mockMvc.perform(put("/api/events/{id}",event.getId())
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                 .accept(MediaTypes.HAL_JSON) // HAL_JSON을 응답을 원한다.
                 .content(objectMapper.writeValueAsString(eventDto))) // objectmapper를 사용해 객체를 json으로 만듬
                 .andDo(print())
@@ -421,7 +421,7 @@ public class EventControllerTests extends BaseControllerTest {
         // when then
         this.mockMvc.perform(put("/api/events/12345")
                 .header(HttpHeaders.AUTHORIZATION, getBearerToken())
-                .contentType(MediaType.APPLICATION_JSON_UTF8) // Json 담아서 요청한다.
+                .contentType(MediaType.APPLICATION_JSON) // Json 담아서 요청한다.
                 .content(objectMapper.writeValueAsString(eventDto))) // objectmapper를 사용해 객체를 json으로 만듬
                 .andDo(print())
                 .andExpect(status().isNotFound())
