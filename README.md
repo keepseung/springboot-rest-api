@@ -17,7 +17,7 @@ Self-Describtive Message와 HATEOAS를 만족하는 REST API입니다.
   POST /api/events
 3. 이벤트 하나 조회    
   GET /api/events/{id} 
-4. 이벤트 하나 수정
+4. 이벤트 하나 수정    
   PUT /api/events/{id}
   
 ## 사용 기술
